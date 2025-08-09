@@ -1,5 +1,4 @@
 import { isValidOpenSSHPublicKey } from '$lib/util/ssh';
-import { fail } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { ErrorCodes, VimperfectError } from '$lib/errors';
 import { addUserPublicKey, userHasPublicKey } from '$lib/server/service/user';
@@ -28,7 +27,7 @@ export const actions = {
 			return { publicKeySaved: true };
 		} catch (e) {
 			if (e instanceof VimperfectError) {
-				return fail(400, e.toSvelteKitError());
+				return e.toActionFailure(400);
 			}
 			throw e;
 		}
