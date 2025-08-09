@@ -1,9 +1,18 @@
 <script lang="ts">
-	import '../app.css';
 	import { authClient } from '$lib/auth-client';
 
 	const session = authClient.useSession();
 	let loadingGithub = false;
+
+	function handleGithubLogin() {
+		if (!loadingGithub) {
+			loadingGithub = true;
+			authClient.signIn.social({
+				provider: 'github',
+				newUserCallbackURL: '/profile/onboarding'
+			});
+		}
+	}
 </script>
 
 {#if $session.data?.user}
@@ -16,28 +25,12 @@
 		<p>
 			{$session?.data.user.username}
 		</p>
-		<button
-			class="btn btn-active btn-error"
-			on:click={async () => {
-				await authClient.signOut();
-			}}
-			>Signout
-		</button>
+		<button class="btn btn-active btn-error" on:click={() => authClient.signOut()}>Signout </button>
 	</div>
 {:else if $session.isPending}
 	<span class="loading loading-spinner loading-lg"></span>
 {:else}
-	<button
-		class="btn bg-black text-white border-black"
-		on:click={async (e) => {
-			if (!loadingGithub) {
-				loadingGithub = true;
-				await authClient.signIn.social({
-					provider: 'github'
-				});
-			}
-		}}
-	>
+	<button class="btn bg-black text-white border-black" on:click={handleGithubLogin}>
 		{#if loadingGithub}
 			<span class="loading loading-spinner"></span>
 		{:else}
